@@ -1,0 +1,16 @@
+{{ ansible_managed | comment }}
+
+[Unit]
+Description=rsync backup script
+Requires=local-fs.target
+After=local-fs.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/bin/true
+ExecStop=/bin/bash -c '{{ backup_script_dir }}/backup.sh --quiet'
+User=vagrant
+
+[Install]
+WantedBy=multi-user.target

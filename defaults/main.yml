@@ -1,2 +1,18 @@
 ---
-# defaults file for ansible_role_backup
+# The frequency to perform the backup
+backup_frequency_minutes: 5
+
+# The rsync filter of files/directories to include/exclude
+backup_filter: |
+  !
+  # Include everything
+  + /*
+
+# Directory for backup scripts
+backup_script_dir: '~/.backup'
+
+# The name to use for cron
+backup_cron_name: backup
+
+# The name to use for systemd service
+backup_service_name: backup

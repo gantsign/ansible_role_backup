@@ -1,2 +1,90 @@
 ---
-# tasks file for ansible_role_backup
+- name: install rsync
+  become: yes
+  package:
+    name: rsync
+    state: present
+
+- name: create backup script directory
+  become: yes
+  become_user: '{{ backup_user }}'
+  file:
+    path: '{{ backup_script_dir }}'
+    state: directory
+    mode: 'u=rwx,go=rx'
+
+- name: create backup directory
+  become: yes
+  become_user: '{{ backup_user }}'
+  file:
+    path: '{{ backup_dest }}'
+    state: directory
+    mode: 'u=rwx,go=rx'
+
+- name: write backup script
+  become: yes
+  become_user: '{{ backup_user }}'
+  template:
+    src: backup.sh.j2
+    dest: '{{ backup_script_dir }}/backup.sh'
+    mode: 'u=rwx,go=r'
+
+- name: write backup-impl script
+  become: yes
+  become_user: '{{ backup_user }}'
+  template:
+    src: backup-impl.sh.j2
+    dest: '{{ backup_script_dir }}/backup-impl.sh'
+    mode: 'u=rw,go=r'
+
+- name: write rsync-filter script
+  become: yes
+  become_user: '{{ backup_user }}'
+  template:
+    src: rsync-filter.j2
+    dest: '{{ backup_script_dir }}/rsync-filter'
+    mode: 'u=rw,go=r'
+
+- name: restore previous backup
+  tags:
+    # [ANSIBLE0013] Use shell only when shell functionality is required
+    # We need shell to resolve ~ in backup_script_dir
+    - skip_ansible_lint
+  become: yes
+  become_user: '{{ backup_user }}'
+  shell: '{{ backup_script_dir }}/backup.sh --stats-only --restore'
+  register: restore
+  changed_when: "'Number of created files: 0' not in restore.stdout"
+
+- name: create cron directory
+  become: yes
+  file:
+    path: '/etc/cron.d'
+    state: directory
+    mode: 'u=rwx,go=rx'
+
+- name: create cron job
+  become: yes
+  cron:
+    name: '{{ backup_cron_name }}'
+    minute: '*/{{ backup_frequency_minutes }}'
+    user: '{{ backup_user }}'
+    job: "/bin/bash -c '{{ backup_script_dir }}/backup.sh --quiet --nonblock'"
+    cron_file: '{{ backup_cron_name }}'
+
+- name: write service script
+  become: yes
+  template:
+    src: backup.service.j2
+    dest: '/etc/systemd/system/{{ backup_service_name }}.service'
+    mode: 'u=rw,go=r'
+
+- name: add backup service to default run level and start
+  become: yes
+  tags:
+    # Add init-system tag so we can skip this task when running in Docker
+    - init-system
+  service:
+    name: '{{ backup_service_name }}'
+    enabled: yes
+    state: started

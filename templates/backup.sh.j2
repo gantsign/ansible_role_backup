@@ -1,0 +1,41 @@
+#!/bin/bash
+
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+
+script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+
+backup_args=('--delete')
+flock_args=('--exclusive')
+verbosity_args=('--verbose' '--stats' '--human-readable')
+src={{ backup_src | quote }}
+dest={{ backup_dest | quote }}
+dirs=("$src" "$dest")
+
+for i in "$@"; do
+    case $i in
+        --quiet)
+            verbosity_args=('--quiet')
+            shift
+        ;;
+        --stats-only)
+            verbosity_args=('--stats' '--human-readable')
+            shift
+        ;;
+        --nonblock)
+            flock_args+=('--nonblock' '--conflict-exit-code=0')
+            shift
+        ;;
+        --restore)
+            backup_args=()
+            dirs=("$dest" "$src")
+            shift
+        ;;
+        *)
+            shift
+        ;;
+    esac
+done
+
+flock "${flock_args[@]}" "$script_dir/backup-impl.sh" bash \
+    "$script_dir/backup-impl.sh" \
+    "${backup_args[@]}" "${verbosity_args[@]}" "${dirs[@]}"

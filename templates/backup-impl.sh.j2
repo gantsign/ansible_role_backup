@@ -1,0 +1,9 @@
+script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+
+rsync \
+  --recursive \
+  --safe-links \
+  --perms \
+  --times \
+  --filter="merge $script_dir/rsync-filter" \
+  "$@"
