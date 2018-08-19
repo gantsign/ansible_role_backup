@@ -1,19 +1,29 @@
 ---
 dependency:
   name: galaxy
+
 driver:
   name: docker
+
 lint:
   name: yamllint
+
 platforms:
-  - name: instance
-    image: centos:7
+  - name: ansible_role_backup_default
+    image: ubuntu:18.04
+
 provisioner:
   name: ansible
+  options:
+    # Docker doesn't support the init system so we skip the service registration
+    # by adding --skip-tags init-system when running the ansible-playbook
+    skip-tags: init-system
   lint:
     name: ansible-lint
+
 scenario:
   name: default
+
 verifier:
   name: testinfra
   lint:

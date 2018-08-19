@@ -1,5 +1,43 @@
 ---
 - name: Converge
   hosts: all
+
+  pre_tasks:
+    - name: create users
+      become: yes
+      user:
+        name: '{{ item }}'
+        state: present
+        home: '/home/{{ item }}'
+        createhome: yes
+      with_items:
+        - test_usr1
+
+    - name: create backup directory
+      become: yes
+      become_user: test_usr1
+      file:
+        path: '/tmp/backup'
+        state: directory
+        mode: 'u=rwx,go=rx'
+
+    - name: create test files
+      become: yes
+      become_user: test_usr1
+      copy:
+        content: 'test'
+        dest: '/tmp/backup/{{ item }}'
+        mode: 'u=rwx,go=r'
+      with_items:
+        - includeme
+        - excludeme
+
   roles:
     - role: ansible_role_backup
+      backup_user: test_usr1
+      backup_src: /home/test_usr1/
+      backup_dest: /tmp/backup/
+      backup_filter: |
+        !
+        + /includeme
+        - /*
