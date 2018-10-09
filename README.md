@@ -24,7 +24,7 @@ users home directory.
 Requirements
 ------------
 
-* Ansible >= 2.4
+* Ansible >= 2.5
 
 * Linux Distribution
 
