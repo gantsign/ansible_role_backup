@@ -1,2 +1,3 @@
 ---
-# vars file for ansible_role_backup
+# The group of the backup user
+backup_group: '{{ backup_user }}'
