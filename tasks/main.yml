@@ -14,12 +14,14 @@
     mode: 'u=rwx,go=rx'
 
 - name: create backup directory
+  # May need root privileges to create directory (depending on parent dir)
   become: yes
-  become_user: '{{ backup_user }}'
   file:
     path: '{{ backup_dest }}'
     state: directory
     mode: 'u=rwx,go=rx'
+    owner: '{{ backup_user }}'
+    group: '{{ backup_group }}'
 
 - name: write backup script
   become: yes
