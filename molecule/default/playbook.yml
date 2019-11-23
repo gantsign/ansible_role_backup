@@ -32,6 +32,12 @@
         - includeme
         - excludeme
 
+    - name: install cron
+      become: yes
+      apt:
+        name: cron
+        state: present
+
   roles:
     - role: ansible_role_backup
       backup_user: test_usr1
