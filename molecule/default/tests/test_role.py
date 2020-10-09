@@ -1,11 +1,3 @@
-import os
-
-import testinfra.utils.ansible_runner
-
-testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
-    os.environ['MOLECULE_INVENTORY_FILE']).get_hosts('all')
-
-
 def test_backup_script_dir(host):
     dir = host.file('/home/test_usr1/.backup')
     assert dir.exists
