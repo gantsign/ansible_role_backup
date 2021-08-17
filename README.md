@@ -1,7 +1,7 @@
 Ansible Role: Backup
 ====================
 
-[![Build Status](https://travis-ci.com/gantsign/ansible_role_backup.svg?branch=master)](https://travis-ci.com/gantsign/ansible_role_backup)
+[![Tests](https://github.com/gantsign/ansible_role_backup/workflows/Tests/badge.svg)](https://github.com/gantsign/ansible_role_backup/actions?query=workflow%3ATests)
 [![Ansible Galaxy](https://img.shields.io/badge/ansible--galaxy-gantsign.backup-blue.svg)](https://galaxy.ansible.com/gantsign/backup)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/gantsign/ansible_role_backup/master/LICENSE)
 
